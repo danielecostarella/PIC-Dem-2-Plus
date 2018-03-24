@@ -24,3 +24,10 @@ interface
 - Piezo buzzer
 - Prototype area for user hardware
 - Microchip TC74 thermal sensor
+<br>
+<br>
+It can be used as a standalone demonstration board with a programmed part. Alternatively, it can be used with an in-circuit emulator (for example, MPLAB® Real ICETM) or with an in-circuit programmer/debugger (such as MPLAB® ICD 3 or PICkitTM 3).
+
+In this clone I used a PIC16F877A , a 28/40-Pin 8-Bit CMOS FLASH Microcontroller.
+
+The demo was about displaying a real time clock, ambient temperature and a voltmeter. I used the PICkit3 programmer.
