@@ -6,16 +6,12 @@
 ;																		*
 ;    Author: Daniele Costarella											*
 ;    																	*
-;																		* 
-;																		*
 ;************************************************************************
-
 
 	list		p=16f877a
 	#include	P16f877A.INC
 	radix		dec
 	ErrorLevel 	-302
-
 
 ; -------------------------------------------------------------------------
 ; File Register Assignment	
@@ -47,11 +43,11 @@ temp		RES			1
 ; ******************************************************************
 lcdInit
 		banksel TRISD
-		clrf 	TRISD							;sets all bits as output
+		clrf 	TRISD							; Sets all bits as output
 		banksel PORTD
-		bsf 	PORTD, 7						;power supply to lcd
+		bsf 	PORTD, 7						; Power supply to lcd
 		call 	wait
-		MOVLW 	10000011B						;function set
+		MOVLW 	10000011B						; Function set
 		MOVWF 	PORTD
 		call 	clockCycle
 		call 	delayLoop
@@ -62,17 +58,17 @@ lcdInit
 		call 	clockCycle
 		call 	delayLoop
          
-		;start function set
-		MOVLW	10000010B						;parte piu' significativa per 4 bit
+		; Start function set
+		MOVLW	10000010B						; Most significant part for 4 bit
 		MOVWF	PORTD
 		call	clockCycle
 		call	delayLoop
 
-		MOVLW	10000010B						;parte piu' significativa 2nd time
+		MOVLW	10000010B						; Most significant part 2nd time
 		MOVWF	PORTD
 		call	clockCycle
 		call	delayLoop
-		MOVLW	10000100B						;LSB with N=0 (1 line) F =1 (font 1)
+		MOVLW	10000100B						; LSB with N=0 (1 line) F =1 (font 1)
 		MOVWF	PORTD
 		call	clockCycle
 		call	delayLoop
@@ -113,7 +109,7 @@ lcdInit
 		MOVWF	PORTD
 		call	clockCycle
 		call	delayLoop
-		MOVLW	10001100B						; turns off the cursor (10001110 for cursor on)
+		MOVLW	10001100B						; Turns off the cursor (10001110 for cursor on)
 		MOVWF	PORTD
 		call	clockCycle
 		call	delayLoop
@@ -146,25 +142,22 @@ lcdRxShift
 
 
 ; ******************************************************************
-; check if the display is ready
+; Check if the display is ready
 ; ******************************************************************
 waitBusyFlag
         BANKSEL	TRISD
-		MOVLW 	00001111B						; mask for TRISD
+		MOVLW 	00001111B						; Mask for TRISD
 		MOVWF 	TRISD
 		BANKSEL	PORTD
-		BCF 	PORTD, 4						; sets RS low (command mode)
-		BSF		PORTD, 5						; write mode
-
-		;clrf 	count1
-		;MOVWF 	count1
+		BCF 	PORTD, 4						; Sets RS low (command mode)
+		BSF		PORTD, 5						; Write mode
 		
 waitBF
 
-		bsf 	PORTD, EN						; set enable high
-		BTFSS 	PORTD, 3						; busy flag bit: 1 = busy
+		bsf 	PORTD, EN						; Set enable high
+		BTFSS 	PORTD, 3						; Busy flag bit: 1 = busy
 		goto 	exit
-		bcf 	PORTD, EN						; set enable low
+		bcf 	PORTD, EN						; Set enable low
 		call 	clockCycle						; LS nibble reading (dummy)
 		goto 	waitBF
 exit
@@ -195,12 +188,12 @@ return2home										; DEPRECATED. Use setXAddress instead of this
 ; Set cursor position on the lcd
 setXAddress
 		banksel	temp
-		movwf	temp					; store dd address
+		movwf	temp							; Store dd address
 		call	delayLoop
 		;call 	waitBusyFlag
 		swapf	temp, W
 		andlw	0x0F
-		iorlw	0x88					; set power supply on and DB7 high
+		iorlw	0x88							; Set power supply on and DB7 high
 		;movlw 	10001000B
 		banksel	PORTD
 		movwf	PORTD
@@ -241,24 +234,19 @@ lcdWrite
 
 printString
 		movwf 	point2Char
-	
 		call 	nextChar
 		IORLW 	0
 		BTFSC 	STATUS, Z
 		return
 		call 	lcdWrite
-		
 		incf 	point2Char, f
-		
 		goto 	printString + 1
 		
-
 nextChar
 		movfw	point2Char
 		movwf 	PCL
 		call 	delayLoop
 		return
-
 
 lcdDemo1
 		call	lcdClear

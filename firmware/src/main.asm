@@ -1,20 +1,22 @@
 ; ------------------------------------------------------------------------	;
-; TITLE: Demonstration of A/D converter and I2C use on a PicDem board	;
+; TITLE: Demonstration of A/D converter and I2C use on a PicDem board		;
 ;																			;
-; Candidate: 	Daniele Costarella											;
-; ID:			884/000376													;
-; ------------------------------------------------------------------------	;
-;																			;
+; Author: 	Daniele Costarella												;
 ; Filename:		main.asm													;
 ; Revision:		1.0.4														;
-; Date:																		;
-;																			;
-; System files required:													;
-;				lcdctrl.asm													;
-;				commons.asm												;
-;				P16F877A.inc												;
-;				16F877A.lkr													;
 ; ------------------------------------------------------------------------	;
+
+; This is the main program file for a demonstration of A/D converter and
+; I2C usage on a PicDem board. The program is written in assembly language
+; for the PIC16F877a microcontroller.
+
+; ------------------------------------------------------------------------ ;
+; Required system files:
+; lcdctrl.asm
+; commons.asm
+; P16F877A.inc
+; 16F877A.lkr
+; ------------------------------------------------------------------------ ;
 
 ; ***************************************************************************
 ; * 																		*
@@ -31,7 +33,7 @@
 		#include        P16f877A.INC
 		radix           dec
 		ErrorLevel      -302
-     	__CONFIG   h'3D31'					; with Power On Reset old_value
+     	__CONFIG   h'3D31'					; Configuration register value for Power On Reset
 
 ; ------------------------------------------------------------------------ ;
 ; Config register bits
@@ -39,6 +41,7 @@
 ;  1   1   1   1   0   1   0   0   1   1   0   0   0   1
 ; ------------------------------------------------------------------------ ;
 
+; The configuration register is set to enable various options on the microcontroller.
 
 		extern		delayLoop, wait
 		extern		lcdInit, lcdWrite, waitBusyFlag, setXAddress
@@ -51,58 +54,50 @@
 ;***** VARIABLE DEFINITIONS *****
  
 SHARED				UDATA_SHR   
-w_temp				RES			1				; variable used for context saving 
-stat_temp			RES			1				; variable used for context saving
+w_temp				RES			1		; Variable used for context saving 
+stat_temp			RES			1		; Variable used for context saving
  
  
-RAM0				UDATA				; explicit address specified is not required
-count				RES			1		; temporary variable (example)
+RAM0				UDATA				; Explicit address specified is not required
+count				RES			1		; Temporary variable (example)
  
-index				EQU			242		; init count var
+index				EQU			242		; Initialize count variable
 delayCount			EQU			15
 ;BITTEST			EQU			H'01'
-char				RES			1		; char to print
+char				RES			1		; Char to print
 point2Char			RES			1
-temp3				RES			1		; non usata
+temp3				RES			1		; Unused
 
-binvalue			RES			3		; binary value to convert to bcd
+binvalue			RES			3		; Binary value to convert to BCD
 untten				RES			1
 hdrthd				RES			1
-tensOfThousands		RES			1 		;tensOfThousands
+tensOfThousands		RES			1 
 milions				RES			1
 
-temp				RES			3		; utilizzata per la moltiplicazione
+temp				RES			3		; Used for multiplication
 cmd_byte			RES 		1
-mode				RES			1		; selected mode (voltmeter or thermometer)
+mode				RES			1		; Selected mode (voltmeter or thermometer)
 										; 00000001 => main menu
 										; 00000010 => voltmeter
 										; 00000100 => thermometer
 
 ; daa function
-num1		RES	2
-num2		RES 2
-adjflag		RES	1
-sum			RES	2
-number		RES 1
-;floatingValues		RES			7		; utilizzati per l'arrotondamento
-
+num1		RES	2						; First number to add 
+num2		RES 2						; Second number to add
+adjflag		RES	1						; Flag to adjust the result of the addition
+sum			RES	2						; Result of the addition
+number		RES 1						; Temporary variable used in the DAA function 
  
- 
-; example of using Overlayed Uninitialized Data Section
-G_DATA				UDATA_OVR			; explicit address can be specified
-flag				RES			2		; temporary variable (shared locations - G_DATA)
+; Example of using Overlayed Uninitialized Data Section
+G_DATA				UDATA_OVR			; Explicit address can be specified
+flag				RES			2		; Temporary variable shared between different sections of the program (shared locations - G_DATA)
  
 G_DATA				UDATA_OVR   
-count1				RES			1		; temporary variable (shared locations - G_DATA)
+count1				RES			1		; Temporary variable shared between different sections of the program (shared locations - G_DATA)
 var					RES			1
-;temp				RES			1
-
 var2				RES			2
-resconv				RES			2		; resconv è il risultato di hexconv
-SW_STATUS			RES			1		; register status of switch ******11 or 00 (pushed)
-
-
-
+resconv				RES			2		; Result of a hexadecimal conversion
+SW_STATUS			RES			1		; Status register of switch ******11 or 00 (pushed)
 
 #DEFINE				EN			6
 
@@ -422,7 +417,7 @@ tensAndUnits
 		call	setXAddress
 		goto	getTemp		
 
-; The binary value is in 2’s complement format so it needs to be converted
+; The binary value is in 2ï¿½s complement format so it needs to be converted
 ; twoComplement writes the correct value in binvalue+2
 twoComplement				
 		;movlw	"-"
@@ -606,7 +601,7 @@ waitEOC									; wait end of conversion
 		movwf	num1
 
 		; carico il numero di test 444 (556+444= 1000 setterebbe a 1
-		; il nibble più significatico
+		; il nibble piï¿½ significatico
 
 		movlw	0x04
 		movwf	num2
@@ -627,7 +622,7 @@ waitEOC									; wait end of conversion
 		btfsc	STATUS, C
 		addlw	1						; Add one for carry
 		
-		addwf	num1, W  				; in W c'è num1 + (num2 + C)
+		addwf	num1, W  				; in W c'ï¿½ num1 + (num2 + C)
 		
 		movwf	number
 		call	daa
@@ -635,9 +630,9 @@ waitEOC									; wait end of conversion
 		movwf	sum
 
 		; controllo il l'ms nibble di sum. Se 1 significa che
-		; il risultato della somma è maggiore o uguale a 1000;
+		; il risultato della somma ï¿½ maggiore o uguale a 1000;
 		; allora mi preparo per incrementare le restanti cifre
-		; più significative
+		; piï¿½ significative
 	
 		btfsc	sum, 4
 		goto 	rounding
